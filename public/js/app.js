@@ -119,7 +119,7 @@ function tweetpost() {
         withCredentials: true
     }).then((response) => {
         if (response.data.status === 200) {
-            alert(response.data.message)
+            // alert(response.data.message)
             return
         } else {
             alert(response.data.message)
