@@ -1,7 +1,7 @@
 
 
-var url = "https://my-chat1.herokuapp.com";
-// var url = "http://localhost:5000";
+// var url = "https://my-chat1.herokuapp.com";
+var url = "http://localhost:5000";
 var socket = io(url);
 
 socket.on('connect', function () {
@@ -57,6 +57,78 @@ function login() {
     });
 
     return false;
+}
+
+
+
+function getProfile() {
+    axios({
+        method: 'get',
+        url: url + '/profile',
+        credentials: 'include',
+    }).then((response) => {
+        console.log(response);
+        document.getElementById('name').innerHTML = response.data.profile.name
+        document.getElementById('email').innerHTML = response.data.profile.email
+        document.getElementById("show_pic").src = response.data.profile.profilePic
+    }, (error) => {
+        console.log(error.message);
+    });
+    return false
+}
+
+
+
+function upload() {
+
+    var fileInput = document.getElementById("fileInput");
+
+    // // To convert a File into Blob (not recommended)
+    // var blob = null;
+    // var file = fileInput.files[0];
+    // let reader = new FileReader();
+    // reader.readAsArrayBuffer(file)
+    // reader.onload = function (e) {
+    //     blob = new Blob([new Uint8Array(e.target.result)], { type: file.type });
+    //     console.log(blob);
+    // }
+
+    console.log("fileInput: ", fileInput);
+    console.log("fileInput: ", fileInput.files[0]);
+
+    let formData = new FormData();
+    // https://developer.mozilla.org/en-US/docs/Web/API/FormData/append#syntax
+
+    formData.append("myFile", fileInput.files[0]); // file input is for browser only, use fs to read file in nodejs client
+    // formData.append("myFile", blob, "myFileNameAbc"); // you can also send file in Blob form (but you really dont need to covert a File into blob since it is Actually same, Blob is just a new implementation and nothing else, and most of the time (as of january 2021) when someone function says I accept Blob it means File or Blob) see: https://stackoverflow.com/questions/33855167/convert-data-file-to-blob
+    formData.append("email", sessionStorage.getItem("email")); // this is how you add some text data along with file
+    formData.append("myDetails",
+        JSON.stringify({
+            "subject": "Science",   // this is how you send a json object along with file, you need to stringify (ofcourse you need to parse it back to JSON on server) your json Object since append method only allows either USVString or Blob(File is subclass of blob so File is also allowed)
+            "year": "2021"
+        })
+    );
+
+    // you may use any other library to send from-data request to server, I used axios for no specific reason, I used it just because I'm using it these days, earlier I was using npm request module but last week it get fully depricated, such a bad news.
+    axios({
+        method: 'post',
+        url: url + "/upload",
+        data: formData,
+        headers: { 'Content-Type': 'multipart/form-data' }
+    })
+        .then(res => {
+            console.log(`  upload Success`);
+            alert("upload Success")
+            // document.getElementById("show_pic").innerHTML = instanceOfFileReader.readAsDataURL(res.data);
+
+
+        })
+        .catch(err => {
+            console.log(err);
+        })
+
+    return false; // dont get confused with return false, it is there to prevent html page to reload/default behaviour, and this have nothing to do with actual file upload process but if you remove it page will reload on submit -->
+
 }
 
 function forget() {
@@ -218,23 +290,20 @@ socket.on("MY_POST", (newPost) => {
 })
 
 
-function getProfile() {
-    axios({
-        method: 'get',
-        url: url + '/profile',
-        credentials: 'include',
-    }).then((response) => {
-        console.log(response);
-        document.getElementById('name').innerHTML = response.data.profile.name
-        document.getElementById('email').innerHTML = response.data.profile.email
-    }, (error) => {
-        console.log(error.message);
-    });
-    return false
+function previewFile() {
+    const preview = document.querySelector('img');
+    const file = document.querySelector('input[type=file]').files[0];
+    const reader = new FileReader();
+
+    reader.addEventListener("load", function () {
+        // convert image file to base64 string
+        preview.src = reader.result;
+    }, false);
+
+    if (file) {
+        reader.readAsDataURL(file);
+    }
 }
-
-
-
 
 function logout() {
     axios({
@@ -251,6 +320,10 @@ function logout() {
 }
 
 
+function showProfile() {
+    document.getElementById('other').style.display = "none"
+    document.getElementById('profile').style.display = "block"
+}
 
 
 

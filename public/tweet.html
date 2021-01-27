@@ -17,7 +17,7 @@
         integrity="sha384-pQQkAEnwaBkjpqZ8RU1fF1AKtTcHJwFl3pblpTlHXybJjHpMYo79HY3hIi4NKxyj"
         crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <script src="./js/socket.io.js"></script>
+    <script src="js/socket.io.js"></script>
     <style>
         ol {
             display: flex;
@@ -28,15 +28,38 @@
         li {
             flex: 0 0 auto;
         }
+
+        .file-upload {
+            height: 170px;
+            width: 170px;
+            margin: 40px auto;
+            border: 1px solid #f0c0d0;
+            border-radius: 100px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .file-upload input {
+            position: absolute;
+            height: 400px;
+            width: 400px;
+            left: -200px;
+            top: -200px;
+            background: transparent;
+            opacity: 0;
+            -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
+            filter: alpha(opacity=0);
+        }
+
+        .file-upload img {
+            height: 170px;
+            width: 170px;
+
+        }
     </style>
 </head>
 
-<body onload="gettweet(); mytweet();">
-    <style>
-        * {
-            background-color: rgb(250, 182, 158);
-        }
-    </style>
+<body onload="getProfile(); gettweet();">
 
     <div class="container-fluid">
         <div class="row">
@@ -45,36 +68,59 @@
                 <h5 id="email"></h5>
             </div>
             <div class="col">
-                <h1 style="text-align: center;">Enjoy Chat</h1>
+                <h1 style="text-align: center;">Twitter</h1>
             </div>
             <div class="col" style="text-align: center; margin-top: 25px;">
                 <button type="button" onclick="logout()" class="btn btn-outline-success">LOG OUT</button>
             </div>
         </div>
         <div class="row">
-            <div class="input-group mb-3" style="width: 60%;margin: 0 auto; top:80px ;">
-                <input type="text" class="form-control" placeholder="Write Tweet" aria-label="Recipient's username"
-                    aria-describedby="button-addon2" id="tweet">
-                <button class="btn btn-outline-success" type="button" onclick="tweetpost()">POST</button>
+            <div class="col">
+                <form>
+                    <!-- dont get confused with return keyword inside onsubmit, 
+                it is there to prevent html page to reload/default behaviour,
+                and this have nothing to do with actual file upload process 
+                but if you remove it page will reload on submit -->
+                    <div class="file-upload">
+                        <!--place upload image/icon first !-->
+                        <img src="images/dy62M.png" id="show_pic" />
+                        <!--place input file last !-->
+                        <input type="file" onchange="previewFile(); upload()" id="fileInput" required/>
+                        <br>
+                        
+                    </div>
+                   <center> <button type="submit" class="btn btn-outline-success"> Upload </button></center>
+
+                </form>
             </div>
         </div>
-
         <div class="row">
+            <form onsubmit="return tweetpost()">
+                <div class="input-group mb-3" style="width: 60%;margin: 0 auto; top:80px ;">
+                    <input type="text" class="form-control" placeholder="Write Tweet" aria-label="Recipient's username"
+                        aria-describedby="button-addon2" id="tweet">
+                    <input type="submit" class=" btn btn-outline-success" value="POST"></input>
+
+                </div>
+            </form>
+        </div>
+
+        <div class=" row">
             <p style="width: 60%;margin: 0 auto; margin-top: 100px;display: flexbox;padding: 5px;">
                 <a class="btn btn-primary" data-bs-toggle="collapse" href="#multiCollapseExample1" role="button"
-                    aria-expanded="false" aria-controls="multiCollapseExample1">MY TWEETS</a>
+                    aria-expanded="false" aria-controls="multiCollapseExample1">YOUR TWEETS</a>
                 <button class="btn btn-primary" type="button" data-bs-toggle="collapse"
                     data-bs-target="#multiCollapseExample2" aria-expanded="false"
-                    aria-controls="multiCollapseExample2">FRIEND TWEETS</button>
+                    aria-controls="multiCollapseExample2">OTHER TWEETS</button>
                 <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target=".multi-collapse"
-                    aria-expanded="false" aria-controls="multiCollapseExample1 multiCollapseExample2">ALL TWEETS
-                </button>
+                    aria-expanded="false" aria-controls="multiCollapseExample1 multiCollapseExample2">BOTH
+                    TWEETS</button>
             </p>
             <div class="row">
                 <div class="col">
                     <div class="collapse multi-collapse" id="multiCollapseExample1">
                         <div class="card card-body">
-                            <ol id="getalltweet">
+                            <ol id="mytweet">
 
                             </ol>
                         </div>
@@ -83,7 +129,7 @@
                 <div class="col">
                     <div class="collapse multi-collapse" id="multiCollapseExample2">
                         <div class="card card-body">
-                            <ol id="mytweet">
+                            <ol id="getall">
 
                             </ol>
                         </div>

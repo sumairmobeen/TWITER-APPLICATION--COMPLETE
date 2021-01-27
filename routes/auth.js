@@ -5,6 +5,7 @@ var { userModel, otpModel } = require("../dbrepo/models");
 var postmark = require("postmark");
 var { SERVER_SECRET } = require("../core/index");
 
+var  client = new postmark.Client("3ab6962c-123d-45b6-a7ef-41aabd8df4e9")
 var api = express.Router();
 
 
