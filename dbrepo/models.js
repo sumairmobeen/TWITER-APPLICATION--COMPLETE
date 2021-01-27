@@ -34,6 +34,7 @@ var userSchema = new mongoose.Schema({
     "password": String,
     "phone": String,
     "gender": String,
+    "profilePic": String,
     "createdOn": { "type": Date, "Default": Date.now },
     "activeSince": Date
 });
@@ -51,7 +52,8 @@ var otpModel = mongoose.model("opt", otpSchema)
 
 var tweetSchema = new mongoose.Schema({
     "username": String,
-    "tweet": String
+    "tweet": String,
+    "profilePic":String
 });
 
 var tweetModel = mongoose.model("tweet", tweetSchema);
